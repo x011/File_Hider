@@ -7,8 +7,9 @@ File Hider is a sophisticated tool that allows you to securely hide and encrypt 
 - Multi-layered encryption: Each file is encrypted with AES-256 not once, but seven times for added security.
 - RSA encryption: The AES key is encrypted with RSA, ensuring that only the holder of the private key can decrypt the hidden file.
 - Secure hiding: The encrypted file is hidden within another file, making it difficult to detect that a hidden file exists.
-- File name preservation: The original file is preserved and can be restored upon decryption.
+- File name preservation: The original file name is preserved and can be restored upon decryption.
 - Rename option: Provides the ability to rename the original file before saving it during the unhide process.
+- Command line support: Allows hiding and unhiding files via command line arguments.
 
 ## How to Use
 
@@ -19,36 +20,57 @@ Generate an RSA key pair for encryption and decryption:
 1. Open a terminal or command prompt.
 2. Generate a private key with AES-256 encryption:
 
-   `openssl genpkey -algorithm RSA -out pri_filehider.pem -aes256 -pkeyopt rsa_keygen_bits:4096 -pass pass:your_password`
+   `openssl genpkey -algorithm RSA -out private_key.pem -aes256 -pkeyopt rsa_keygen_bits:4096 -pass pass:your_password`
 
    Replace `your_password` with a strong passphrase.
 
 3. Extract the public key from the private key:
 
-   `openssl rsa -pubout -in pri_filehider.pem -out pub_filehider.pem -passin pass:your_password`
+   `openssl rsa -pubout -in private_key.pem -out public_key.pem -passin pass:your_password`
 
    Use the same passphrase as before.
 
-### Hide a File
+### Hide a File (GUI)
 
 1. Run the File Hider application.
 2. Click "Hide and Encrypt File".
 3. Select a host file to contain the hidden file.
 4. Select the file to hide and encrypt.
-5. Select the public key file (`pub_filehider.pem`) for RSA encryption.
+5. Select the public key file (`public_key.pem`) for RSA encryption.
 6. Choose a location and name for the modified host file.
 7. The application encrypts and hides the file within the host file.
 
-### Unhide a File
+### Unhide a File (GUI)
 
 1. Run the File Hider application.
 2. Click "Decrypt and Unhide File".
 3. Select the modified host file with the hidden file.
-4. Select the private key file (`pri_filehider.pem`) for RSA decryption.
+4. Select the private key file (`private_key.pem`) for RSA decryption.
 5. Enter the passphrase for the private key.
 6. Choose the output directory for the decrypted file.
 7. Optionally, rename the original file before saving.
 8. The application decrypts and extracts the hidden file.
+
+### Command Line Usage
+
+#### Hide a File
+
+`python file_hider.py --hide --host path_to_host_file --file path_to_hidden_file --public-key path_to_public_key --output path_to_output_file`
+
+
+#### Unhide a File
+
+`python file_hider.py --unhide --host path_to_modified_host_file --private-key path_to_private_key --output path_to_extracted_file --passphrase your_private_key_passphrase`
+
+### Examples
+
+- To hide a file:
+
+ `python file_hider.py --hide --host host.jpg --file secret.txt --public-key public_key.pem --output hidden.jpg`
+
+- To unhide a file:
+
+`python file_hider.py --unhide --host hidden.jpg --private-key private_key.pem --output secret.txt --passphrase mypassphrase`
 
 ## Windows Executable
 
