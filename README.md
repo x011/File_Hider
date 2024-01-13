@@ -7,7 +7,7 @@ File Hider is a sophisticated tool that allows you to securely hide and encrypt 
 - Multi-layered encryption: Each file is encrypted with AES-256 not once, but seven times for added security.
 - RSA encryption: The AES key is encrypted with RSA, ensuring that only the holder of the private key can decrypt the hidden file.
 - Secure hiding: The encrypted file is hidden within another file, making it difficult to detect that a hidden file exists.
-- File and extension preservation: The original file name and extension are preserved and can be restored upon decryption.
+- File name preservation: The original file is preserved and can be restored upon decryption.
 - Rename option: Provides the ability to rename the original file before saving it during the unhide process.
 
 ## How to Use
