@@ -14,7 +14,6 @@ NUM_ITERATIONS = 100000
 KEY_SIZE = 32  # 256 bits for AES-256
 IV_SIZE = 16
 NUM_LAYERS = 7
-EXT_SIZE = 10  # Maximum file extension length
 FILENAME_SIZE = 255  # Maximum filename length
 
 # Function to encrypt data with AES and then encrypt AES key with RSA
@@ -93,20 +92,17 @@ def hide_file():
         enc_session_key, salt, encrypted_hidden_data = encrypt_data(hidden_data, public_key_path)
         
         # Save the file extension and filename of the hidden file
-        file_extension = os.path.splitext(hidden_file_path)[1].encode('utf-8')
-        file_extension += b' ' * (EXT_SIZE - len(file_extension))  # Pad the file extension to EXT_SIZE
-        filename = os.path.basename(hidden_file_path).encode('utf-8')
-        filename += b' ' * (FILENAME_SIZE - len(filename))  # Pad the filename to FILENAME_SIZE
+        full_filename = os.path.basename(hidden_file_path).encode('utf-8')
+        full_filename += b' ' * (FILENAME_SIZE - len(full_filename))  # Pad the full filename to FILENAME_SIZE
         
         with open(output_path, 'wb') as output_file:
             output_file.write(host_data)
             output_file.write(enc_session_key)
             output_file.write(salt)
-            output_file.write(file_extension)  # Write the padded file extension
-            output_file.write(filename)  # Write the padded filename
+            output_file.write(full_filename)  # Write the padded full filename
             output_file.write(encrypted_hidden_data)
-            # Store the sizes of the encrypted session key, salt, file extension, filename, and encrypted hidden data
-            output_file.write(struct.pack('<IIIII', len(enc_session_key), len(salt), EXT_SIZE, FILENAME_SIZE, len(encrypted_hidden_data)))
+            # Store the sizes of the encrypted session key, salt, full filename, and encrypted hidden data
+            output_file.write(struct.pack('<IIII', len(enc_session_key), len(salt), FILENAME_SIZE, len(encrypted_hidden_data)))
         
         messagebox.showinfo("Success", "The file has been successfully hidden and encrypted within the host file!")
     except Exception as e:
@@ -128,16 +124,15 @@ def unhide_file():
     
     try:
         with open(host_file_path, 'rb') as host_file:
-            host_file.seek(-20, os.SEEK_END)  # Seek to the last 20 bytes where the sizes are stored
-            enc_session_key_size, salt_size, ext_size, filename_size, encrypted_hidden_data_size = struct.unpack('<IIIII', host_file.read(20))
+            host_file.seek(-16, os.SEEK_END)  # Seek to the last 16 bytes where the sizes are stored
+            enc_session_key_size, salt_size, filename_size, encrypted_hidden_data_size = struct.unpack('<IIII', host_file.read(16))
             host_file.seek(0)
             host_data = host_file.read()
-            # Extract the encrypted session key, salt, file extension, filename, and encrypted hidden data
-            enc_session_key = host_data[-(20 + enc_session_key_size + salt_size + ext_size + filename_size + encrypted_hidden_data_size):-20 - salt_size - ext_size - filename_size - encrypted_hidden_data_size]
-            salt = host_data[-(20 + salt_size + ext_size + filename_size + encrypted_hidden_data_size):-20 - ext_size - filename_size - encrypted_hidden_data_size]
-            file_extension = host_data[-(20 + ext_size + filename_size + encrypted_hidden_data_size):-20 - filename_size - encrypted_hidden_data_size].rstrip(b' ')  # Remove padding
-            filename = host_data[-(20 + filename_size + encrypted_hidden_data_size):-20 - encrypted_hidden_data_size].rstrip(b' ')  # Remove padding
-            encrypted_hidden_data = host_data[-(20 + encrypted_hidden_data_size):-20]
+            # Extract the encrypted session key, salt, full filename, and encrypted hidden data
+            enc_session_key = host_data[-(16 + enc_session_key_size + salt_size + filename_size + encrypted_hidden_data_size):-16 - salt_size - filename_size - encrypted_hidden_data_size]
+            salt = host_data[-(16 + salt_size + filename_size + encrypted_hidden_data_size):-16 - filename_size - encrypted_hidden_data_size]
+            full_filename = host_data[-(16 + filename_size + encrypted_hidden_data_size):-16 - encrypted_hidden_data_size].rstrip(b' ')  # Remove padding
+            encrypted_hidden_data = host_data[-(16 + encrypted_hidden_data_size):-16]
         
         decrypted_data = decrypt_data(enc_session_key, salt, encrypted_hidden_data, private_key_path, passphrase)
         
@@ -147,7 +142,7 @@ def unhide_file():
             return
         
         # Ask for the new filename, providing the original as the default
-        original_filename = filename.decode('utf-8')
+        original_filename = full_filename.decode('utf-8')
         new_filename = simpledialog.askstring("New Filename", "Enter a new filename or use the original:", initialvalue=original_filename)
         if new_filename is None:
             return
