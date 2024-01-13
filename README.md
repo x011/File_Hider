@@ -52,7 +52,7 @@ Generate an RSA key pair for encryption and decryption:
 
 ## Windows Executable
 
-For Windows users, a standalone executable is provided which does not require any dependencies to be installed. Simply download the `.exe` file and run it on your Windows system. [Download the latest release here](https://github.com/x011/File_Hider/releases/latest/download/file_hider_1.0.0.exe)
+For Windows users, a standalone executable is provided which does not require any dependencies to be installed. Simply download the `.exe` file and run it on your Windows system. [Download the latest release](https://github.com/x011/File_Hider/releases)
 
 ## Dependencies (for Python script)
 
