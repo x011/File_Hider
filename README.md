@@ -10,6 +10,8 @@ File Hider is a sophisticated tool that allows you to securely hide and encrypt 
 - File name preservation: The original file name is preserved and can be restored upon decryption.
 - Rename option: Provides the ability to rename the original file before saving it during the unhide process.
 - Command line support: Allows hiding and unhiding files via command line arguments.
+- Compression before encryption: Reduces file size and improves storage efficiency.
+- Base64 encoding of encrypted data: Ensures safe storage and transfer, and reduces detectability by forensic tools.
 
 ## How to Use
 
@@ -57,7 +59,6 @@ Generate an RSA key pair for encryption and decryption:
 
 `python file_hider.py --hide --host path_to_host_file --file path_to_hidden_file --public-key path_to_public_key --output path_to_output_file`
 
-
 #### Unhide a File
 
 `python file_hider.py --unhide --host path_to_modified_host_file --private-key path_to_private_key --output path_to_extracted_file --passphrase your_private_key_passphrase`
@@ -89,6 +90,7 @@ For Windows users, a standalone executable is provided which does not require an
 - **RSA Key Encryption**: The AES session key is encrypted with a RSA public key, ensuring that only the private key holder can decrypt it.
 - **Secure Key Derivation**: Uses PBKDF2 with HMAC-SHA256 for secure key derivation.
 - **Random IVs and Salts**: Each layer of encryption uses a random IV, and the key derivation uses a random salt, enhancing security against certain types of attacks.
+- **Compression and Base64 Encoding**: Compresses data before encryption and encodes the encrypted data in base64, reducing file size and detectability by forensic analysis tools.
 
 ## Security Note
 
